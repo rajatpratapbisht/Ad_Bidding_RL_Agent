@@ -9,9 +9,12 @@ The simulation includes:
 4. Tracking the agent's performance metrics like budget, number of wins, and win rate.
 """
 
+# to be able to use environment library
+import sys
+sys.path.append(sys.path[0] +'/../')
 
-import environment.env as env
-# from ..environment import env
+# import environment.env as env
+from environment import env
 import rewards.rewards_functions as rewards
 from environment.env import KEYWORDS
 
