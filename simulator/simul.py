@@ -1,5 +1,5 @@
 """
-Contributor: Hamza, Weijia
+Contributor: Hamza, Weijia, Rajat
 
 This module simulates a second-price auction environment for ad bidding.
 The simulation includes:
@@ -11,6 +11,7 @@ The simulation includes:
 
 
 import environment.env as env
+# from ..environment import env
 import rewards.rewards_functions as rewards
 from environment.env import KEYWORDS
 
@@ -48,7 +49,7 @@ class AuctionSimulator:
         """
         print("Enter 3 desired keywords for tracking:")
         for i in range(3):
-            keyword = input(f"Keyword {i + 1}: ").strip()
+            keyword = input(f"Keyword {i + 1}: ").strip().upper()
             self.desired_keywords.append(keyword)
         print(f"Tracked Keywords: {self.desired_keywords}")
 
@@ -228,3 +229,26 @@ class AuctionSimulator:
         """
         return len(env.KEYWORDS) + 1    # The agent can choose to either bid for any one of the keyword or not bid at all
     
+
+if __name__ == '__main__':
+    
+    sim = AuctionSimulator(500, ['A', 'B', 'C'], 10, 50)
+    
+    while (not sim.is_terminal()):
+        cur_keywords = sim.get_current_available_keywords()
+        
+        if 'A' in cur_keywords:
+            # bid
+            print(cur_keywords)
+            bid = float(input("bidding amount:\n"))
+            output = sim.run_auction_step(True, 'A', bid )
+            # print(output)
+            print(sim.get_metrics())
+            
+        else:
+            # sim.run_auction_step(False)
+            output = sim.run_auction_step(False, '', 0)
+    
+    print("#################################")
+    print(sim.get_metrics())   
+        
