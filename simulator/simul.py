@@ -1,5 +1,5 @@
 """
-Contributor: Hamza, Weijia
+Contributor: Hamza, Weijia, Keegan
 
 This module simulates a second-price auction environment for ad bidding.
 The simulation includes:
@@ -9,10 +9,14 @@ The simulation includes:
 4. Tracking the agent's performance metrics like budget, number of wins, and win rate.
 """
 
+# to be able to use environment library
+import sys
+sys.path.append(sys.path[0] +'/../')
 
 import environment.env as env
 import rewards.rewards_functions as rewards
 from environment.env import KEYWORDS
+
 
 env.setup()
 
@@ -227,4 +231,55 @@ class AuctionSimulator:
         Returns the dimensionality of the action space of the environment.
         """
         return len(env.KEYWORDS) + 1    # The agent can choose to either bid for any one of the keyword or not bid at all
-    
+
+
+if __name__ == '__main__':
+
+    # DEMO FOR AUCTION SIMULATION
+    print("Welcome to our demo: Here you can see how our RL agent interacts with the simulator environment!")
+
+    priority_keywords_from_user = eval(input("Enter 3 priority keywords separated by commas in the following form: ['KEYWORD', KEYWORD', 'KEYWORD']: "))
+    print(
+        f'Okay, the priority keywords you have set are {priority_keywords_from_user}, in ascending order of priority!')
+
+    initial_budget_from_user = int(input("What is your budget? Enter an integer greater than 50, such as 500:"))
+    print(f'Great, the budget you have set is {initial_budget_from_user} dollars.')
+
+    print("\n\nWe will now begin a simulation of 5 auctions with your budget and priority keywords...\n")
+    sim = AuctionSimulator(initial_budget_from_user, priority_keywords_from_user, 5, 50)
+
+
+
+    auction_number = 1
+    while (not sim.is_terminal()):
+
+        cur_keywords = sim.get_current_available_keywords()
+        print(f'\n--AUCTION #{auction_number}--: Available keywords for bidding: {cur_keywords}')
+
+        # bid on whichever available keyword has highest priority - if available!
+        chosen_keyword_to_bid_on = next((kw for kw in cur_keywords if kw in priority_keywords_from_user), None)
+
+
+        if chosen_keyword_to_bid_on != None:
+
+            # bid
+            print(f'Bidding for the keyword: {chosen_keyword_to_bid_on}')
+
+            bid = float(input("How much do you want to bid? "))
+            observation, reward, done, info_dict = sim.run_auction_step(True, chosen_keyword_to_bid_on, bid)
+
+            print("\n\t\t\t".join("{}\t{}".format(k, v) for k, v in info_dict.items()))
+            auction_number +=1
+
+        else:
+            # sim.run_auction_step(False)
+            print(f'Skipped bidding since no keywords of interest found')
+            output = sim.run_auction_step(False, '', 0)
+            auction_number += 1
+
+    print("#################################")
+    print("METRICS ACROSS ALL AUCTIONS:")
+    print("\n\t\t\t".join("{}\t{}".format(k, v) for k, v in sim.get_metrics().items()))
+    # the above pretty print statement is from https://stackoverflow.com/questions/44689546/how-to-print-out-a-dictionary-nicely-in-python
+
+
